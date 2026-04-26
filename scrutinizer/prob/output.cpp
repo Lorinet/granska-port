@@ -1,8 +1,7 @@
-#include "misc/xmloutput.h"
 #include "output.h"
 #include <sstream>
 #include "defines.h"
-
+#include "misc/xmloutput.h"
 
 #pragma warning(disable: 4786)
 #include <fstream>
@@ -12,7 +11,6 @@
 
 #ifndef NO_XML_SUPPORT
 #include <util/PlatformUtils.hpp>
-
 class XML_handler
 {
 public:

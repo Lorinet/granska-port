@@ -27,11 +27,11 @@ PD = prob# probcheck files directory
 STD = stava# stava files directory
 TOD = token# tokenizer files directory
 CGID = cgigranska# cgigranska files directory
-XERCES = /usr
-INCL = -I$(XERCES)/include/xercesc
+#XERCES = /usr
+#INCL = -I$(XERCES)/include/xercesc
 FLAGS = $(CFLAGS) -I$(CD) -I$(TD) -I$(SD) -I$(PD) -I$(STD) \
-  -I$(TOD) -I.. $(INCL) -DNO_XML_SUPPORT -DNO_ANNOT_FROM_FILE
-LIB_PATH = -L$(XERCES)/lib
+  -I$(TOD) -I.. -DNO_XML_SUPPORT -DNO_ANNOT_FROM_FILE
+#LIB_PATH = -L$(XERCES)/lib
 #LIB_PATH_RT = -R$(XERCES)/lib #set runtime-path at compile time
 
 STAVA_OBJ = $(STD)/stavaapi.o $(STD)/suffix.o $(STD)/rattstava.o
@@ -75,8 +75,10 @@ WEB_LIBS = -lsocket -lnsl
 ALLWWW_OBJ = $(WWW_OBJ) $(SCRUT_OBJ) $(COMMON_OBJ) $(STAVA_OBJ) $(TOK_OBJ) $(TAGGER_OBJ) $(PROBCHECK_OBJ)
 ALL_OBJ = $(MAIN_OBJ) $(SCRUT_OBJ) $(COMMON_OBJ) $(STAVA_OBJ) $(TOK_OBJ)\
   $(TAGGER_OBJ) $(PROBCHECK_OBJ)
+
+STATIC_FLAGS = -O3 -static -static-libgcc -static-libstdc++ -no-pie
 ALL_FLAGS = $(FLAGS) $(COMMON_FLAGS) $(STAVA_FLAGS) $(TOK_FLAGS)\
-  $(DEVELOPERS_TAGGER_FLAGS) $(TAGGER_FLAGS) $(SCRUT_FLAGS) $(PROBCHECK_FLAGS)
+  $(DEVELOPERS_TAGGER_FLAGS) $(TAGGER_FLAGS) $(SCRUT_FLAGS) $(PROBCHECK_FLAGS) $(STATIC_FLAGS)
 
 TAGG_OBJ = $(CD)/file.o $(CD)/message.o $(CD)/timer.o $(TD)/main.o\
   $(TOK_OBJ) $(TAGGER_OBJ)
@@ -95,7 +97,7 @@ WWWLIBS = -lxerces-c1_6_0
 all: $(TARGETS)
 
 developers-tagg: $(DEVELOPERS_TAGG_OBJ)
-	$(CPPC) $(FLAGS) -o $@ $^ $(LIB_PATH) $(LIBS) \
+	$(CPPC) $(FLAGS) -o $@ $^ $(LIBS) \
 
 scrutinizer: $(ALL_OBJ)
 	$(CPPC) $(ALL_FLAGS) -o scrutinizer $(ALL_OBJ) $(LIB_PATH) $(LIBS)

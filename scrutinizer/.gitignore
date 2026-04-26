@@ -2,5 +2,9 @@
 *.a
 scrutinizer
 libgranska.a
+scrutinizer-aarch64
+scrutinizer-x86_64
+libgranska-x86_64.a
+libgranska-aarch64.a
 *.opt
 *.swp

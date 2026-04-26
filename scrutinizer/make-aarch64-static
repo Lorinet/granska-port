@@ -1,0 +1,4 @@
+#!/bin/bash
+make clean
+make scrut/rules.tab.h
+make -j28 CPPC=aarch64-linux-musl-g++ CC=aarch64-linux-musl-gcc libgranska.a scrutinizer

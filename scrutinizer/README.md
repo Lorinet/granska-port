@@ -4,7 +4,7 @@ To compile this project (development and build performed on Void Linux x86-64), 
 
 ```bash
 
-sudo xbps-install -S base-devel flex bison cross-aarch64-linux-musl
+sudo xbps-install -S base-devel flex bison cross-x86_64-linux-musl cross-aarch64-linux-musl
 
 
 ```
@@ -15,21 +15,21 @@ Two dedicated shell scripts are provided to facilitate the build process. Ensure
 
 ### 1. Native Build (Host)
 
-Compiles the scrutinizer command-line utility and the libgranska.a static library for the local x86_64 architecture.
+Compiles the scrutinizer command-line utility and the libgranska.a static library for x86_64 (statically linked with musl libc).
 
 ```bash
 
-./make-host
+./make-x86_64-static
 
 ```
 
 ### 2. ARM64 Build (Cross-Compilation, static linking of musl, suitable for Android NDK)
 
-Generates a static library (libgranska.a) targeting aarch64 architectures. This build utilizes musl to ensure maximum portability and static linking for mobile or embedded targets.
+Compiles the scrutinizer command-line utility and the libgranska.a static library for aarch64 (statically linked with musl libc).
 
 ```bash
 
-./make-arm
+./make-aarch64-static
 
 ```
 

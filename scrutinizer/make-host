@@ -1,4 +1,0 @@
-#!/bin/bash
-make clean
-                                  make scrut/rules.tab.h
-                                  make                                -j28      scrutinizer  libgranska.a

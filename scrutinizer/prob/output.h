@@ -16,5 +16,4 @@ namespace Prob
     Output &no_output(std::ostream &);
 }
 
-
 #endif /* OUTPUT_H */
