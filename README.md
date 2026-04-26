@@ -3,7 +3,7 @@ granska
 
 The KTH text scrutinizer Granska
 
-##Credits & Sources
+## Credits & Sources
 ### 1. Software Engines
 
 ####    Granska (Grammar Checker): Originally developed at KTH (NADA/TCS) by Jonas Bigert, Ola Knutsson, and Viggo Kann.
@@ -32,7 +32,7 @@ The KTH text scrutinizer Granska
 
 - Representatives (https://skrutten.csc.kth.se/tools/src/repr.ptt).
 
-# 3. Modifications (2026 Fork)
+# 3. Modifications
 
 #### To make this legacy codebase run on modern systems and prepare it for Android deployment, the following changes were implemented:
 
