@@ -1,0 +1,4259 @@
+Terminals unused in grammar
+
+    GOTOSYM
+    NEG
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: constdeclarations rules
+
+    2 constdeclarations: ε
+
+    3 $@1: ε
+
+    4 constdeclarations: constdeclarations CONSTSYM UNDEFIDENTSYM ASSIGNSYM $@1 expr ';'
+    5                  | constdeclarations CONSTSYM error ';'
+    6                  | constdeclarations CONSTSYM error CONSTSYM
+
+    7 rules: category
+    8      | rule
+    9      | rules category
+   10      | rules rule
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+   12 rule: maybename '{' altrules '}'
+
+   13 @2: ε
+
+   14 $@3: ε
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+
+   16 @4: ε
+
+   17 rule: maybename '{' '/' STRINGSYM '/' ARROWSYM @4 rhslist '}'
+   18     | maybename '{' '/' error '}'
+   19     | maybename '{' error '}'
+
+   20 newscope: ε
+
+   21 maybename: ε
+   22          | UNDEFIDENTSYM ':' maybename
+   23          | LABELIDENTSYM ':' maybename
+   24          | UNDEFIDENTSYMAT
+   25          | RULEIDENTSYMAT
+   26          | '@'
+
+   27 altrules: altrule
+   28         | altrules ';' newscope altrule
+
+   29 $@5: ε
+
+   30 altrules: error ';' $@5 altrule
+
+   31 @6: ε
+
+   32 altrule: lhs ARROWSYM @6 rhslist
+
+   33 @7: ε
+
+   34 altrule: error ARROWSYM @7 rhslist
+
+   35 rhslist: ε
+   36        | rhslist rhs
+
+   37 rhs: MARKSYM '(' setmark mark
+   38    | CORRSYM '(' setcorr corr
+   39    | JUMPSYM '(' setjump jump
+   40    | INFOSYM '(' setinfo info
+   41    | ACTIONSYM '(' setaction action
+   42    | DETECTSYM '(' STRINGSYM ')'
+   43    | ACCEPTSYM '(' STRINGSYM ')'
+   44    | LINKSYM '(' STRINGSYM STRINGSYM ')'
+   45    | error ')'
+
+   46 setmark: ε
+
+   47 setcorr: ε
+
+   48 setjump: ε
+
+   49 setinfo: ε
+
+   50 setaction: ε
+
+   51 gbglhslist: lhs
+   52           | gbglhslist ';' lhs
+
+   53 lhs: elements
+
+   54 elements: element
+   55         | elements ',' element
+
+   56 $@8: ε
+
+   57 elements: elements elementname $@8 maybeexpr ')'
+   58         | error ','
+
+   59 $@9: ε
+
+   60 $@10: ε
+
+   61 element: elementname $@9 maybeexpr ')' $@10 maybeocc
+
+   62 $@11: ε
+
+   63 element: elementname error ')' $@11 maybeocc
+   64        | ENDLEFTCONTEXTSYM
+   65        | BEGINRIGHTCONTEXTSYM
+
+   66 elementname: UNDEFIDENTSYM '('
+   67            | '(' helprule ')' '('
+   68            | '(' error ')' '('
+   69            | error '('
+
+   70 helprule: UNDEFIDENTSYM
+   71         | RULEIDENTSYM
+   72         | RULEIDENTSYMAT
+   73         | UNDEFIDENTSYM '/' UNDEFIDENTSYM
+   74         | RULEIDENTSYM '/' UNDEFIDENTSYM
+   75         | RULEIDENTSYMAT '/' UNDEFIDENTSYM
+
+   76 maybeocc: ε
+   77         | INTEGERSYM
+   78         | '*'
+   79         | '+'
+   80         | '?'
+
+   81 mark: exprseq ')'
+   82     | error ')'
+
+   83 corr: ')'
+   84     | exprseq ')'
+   85     | error ')'
+
+   86 jump: ')'
+   87     | UNDEFIDENTSYM ')'
+   88     | LABELIDENTSYM ')'
+   89     | UNDEFIDENTSYM ',' expr ')'
+   90     | LABELIDENTSYM ',' expr ')'
+   91     | error ')'
+
+   92 info: ')'
+   93     | exprseq ')'
+   94     | error ')'
+
+   95 action: ')'
+   96       | actionident ')'
+   97       | actionident ',' args ')'
+   98       | error ')'
+
+   99 actionident: TAGIDENTSYM
+  100            | CHECKIDENTSYM
+  101            | LOOKUPIDENTSYM
+  102            | EDITIDENTSYM
+  103            | HELPIDENTSYM
+  104            | ACCEPTIDENTSYM
+
+  105 maybeexpr: ε
+  106          | expr
+
+  107 expr: REALSYM
+  108     | INTEGERSYM
+  109     | STRINGSYM
+  110     | VARIDENTSYM
+  111     | RULEELEMENTIDENTSYM
+  112     | methodorattribute
+  113     | FUNCIDENTSYM arglist
+  114     | CONSTIDENTSYM
+  115     | UNDEFIDENTSYM
+  116     | expr '.' methodorattribute
+  117     | expr '.' error
+  118     | expr '+' expr
+  119     | expr '-' expr
+  120     | expr '=' expr
+  121     | expr '~' expr
+  122     | expr NESYM expr
+  123     | expr LESYM expr
+  124     | expr GESYM expr
+  125     | expr '<' expr
+  126     | expr '>' expr
+  127     | expr '&' expr
+  128     | expr '|' expr
+  129     | expr ASSIGNSYM expr
+  130     | '!' expr
+  131     | '(' '-' expr ')'
+  132     | '(' expr ')'
+  133     | expr '[' expr ']'
+  134     | PROBSYM '(' expr ',' expr ')'
+  135     | FORALLSYM '(' expr ')'
+  136     | EXISTSYM '(' expr ')'
+
+  137 $@12: ε
+
+  138 expr: IFSYM expr THENSYM $@12 exprseq ELSESYM exprseq ENDSYM
+  139     | IFSYM error ENDSYM
+
+  140 methodorattribute: ATTRIDENTSYM
+  141                  | METHIDENTSYM arglist
+
+  142 arglist: '(' args ')'
+  143        | '(' ')'
+  144        | error ')'
+
+  145 args: expr
+  146     | expr ',' args
+
+  147 exprseq: expr
+  148        | expr exprseq
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33) 130
+    '&' (38) 127
+    '(' (40) 11 15 37 38 39 40 41 42 43 44 66 67 68 69 131 132 134 135 136 142 143
+    ')' (41) 11 42 43 44 45 57 61 63 67 68 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 131 132 134 135 136 142 143 144
+    '*' (42) 78
+    '+' (43) 79 118
+    ',' (44) 55 58 89 90 97 134 146
+    '-' (45) 119 131
+    '.' (46) 116 117
+    '/' (47) 17 18 73 74 75
+    ':' (58) 22 23
+    ';' (59) 4 5 28 30 52
+    '<' (60) 125
+    '=' (61) 120
+    '>' (62) 126
+    '?' (63) 80
+    '@' (64) 26
+    '[' (91) 133
+    ']' (93) 133
+    '{' (123) 11 12 15 17 18 19
+    '|' (124) 128
+    '}' (125) 11 12 15 17 18 19
+    '~' (126) 15 121
+    error (256) 5 6 18 19 30 34 45 58 63 68 69 82 85 91 94 98 117 139 144
+    INTEGERSYM <integer> (258) 77 108
+    REALSYM <real> (259) 107
+    STRINGSYM <string> (260) 11 17 42 43 44 109
+    UNDEFIDENTSYM <identifier> (261) 4 11 22 66 70 73 74 75 87 89 115
+    VARIDENTSYM <identifier> (262) 110
+    ATTRIDENTSYM <identifier> (263) 140
+    CONSTIDENTSYM <identifier> (264) 114
+    TAGIDENTSYM <identifier> (265) 99
+    CHECKIDENTSYM <identifier> (266) 100
+    LOOKUPIDENTSYM <identifier> (267) 101
+    LABELIDENTSYM <identifier> (268) 23 88 90
+    EDITIDENTSYM <identifier> (269) 102
+    HELPIDENTSYM <identifier> (270) 103
+    ACCEPTIDENTSYM <identifier> (271) 104
+    RULEIDENTSYM <identifier> (272) 71 74
+    RULEELEMENTIDENTSYM <identifier> (273) 111
+    UNDEFIDENTSYMAT <identifier> (274) 24
+    RULEIDENTSYMAT <identifier> (275) 25 72 75
+    FUNCIDENTSYM <methodorfunction> (276) 113
+    METHIDENTSYM <methodorfunction> (277) 141
+    ARROWSYM (278) 15 17 32 34
+    PROBSYM (279) 134
+    FORALLSYM (280) 135
+    EXISTSYM (281) 136
+    IFSYM (282) 138 139
+    THENSYM (283) 138
+    ELSESYM (284) 138
+    ENDSYM (285) 138 139
+    CONSTSYM (286) 4 5 6
+    GOTOSYM (287)
+    MARKSYM (288) 37
+    CORRSYM (289) 38
+    JUMPSYM (290) 39
+    INFOSYM (291) 11 15 40
+    CATEGORYSYM (292) 11
+    ACTIONSYM (293) 41
+    DETECTSYM (294) 42
+    ACCEPTSYM (295) 43
+    LINKSYM (296) 11 44
+    ENDLEFTCONTEXTSYM (297) 64
+    BEGINRIGHTCONTEXTSYM (298) 65
+    ASSIGNSYM (299) 4 129
+    NESYM (300) 122
+    LESYM (301) 123
+    GESYM (302) 124
+    NEG (303)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (72)
+        on left: 0
+    program (73)
+        on left: 1
+        on right: 0
+    constdeclarations (74)
+        on left: 2 4 5 6
+        on right: 1 4 5 6
+    $@1 (75)
+        on left: 3
+        on right: 4
+    rules (76)
+        on left: 7 8 9 10
+        on right: 1 9 10
+    category (77)
+        on left: 11
+        on right: 7 9
+    rule (78)
+        on left: 12 15 17 18 19
+        on right: 8 10
+    @2 (79)
+        on left: 13
+        on right: 15
+    $@3 (80)
+        on left: 14
+        on right: 15
+    @4 (81)
+        on left: 16
+        on right: 17
+    newscope (82)
+        on left: 20
+        on right: 28
+    maybename <identifier> (83)
+        on left: 21 22 23 24 25 26
+        on right: 12 15 17 18 19 22 23
+    altrules <ruleTerm> (84)
+        on left: 27 28 30
+        on right: 12 28
+    $@5 (85)
+        on left: 29
+        on right: 30
+    altrule <ruleTerm> (86)
+        on left: 32 34
+        on right: 27 28 30
+    @6 (87)
+        on left: 31
+        on right: 32
+    @7 (88)
+        on left: 33
+        on right: 34
+    rhslist (89)
+        on left: 35 36
+        on right: 17 32 34 36
+    rhs (90)
+        on left: 37 38 39 40 41 42 43 44 45
+        on right: 36
+    setmark (91)
+        on left: 46
+        on right: 37
+    setcorr (92)
+        on left: 47
+        on right: 38
+    setjump (93)
+        on left: 48
+        on right: 39
+    setinfo (94)
+        on left: 49
+        on right: 40
+    setaction (95)
+        on left: 50
+        on right: 41
+    gbglhslist <ruleTerm> (96)
+        on left: 51 52
+        on right: 15 52
+    lhs <element> (97)
+        on left: 53
+        on right: 32 51 52
+    elements (98)
+        on left: 54 55 57 58
+        on right: 53 55 57
+    $@8 (99)
+        on left: 56
+        on right: 57
+    element (100)
+        on left: 61 63 64 65
+        on right: 54 55
+    $@9 (101)
+        on left: 59
+        on right: 61
+    $@10 (102)
+        on left: 60
+        on right: 61
+    $@11 (103)
+        on left: 62
+        on right: 63
+    elementname <identifier> (104)
+        on left: 66 67 68 69
+        on right: 57 61 63
+    helprule <identifier> (105)
+        on left: 70 71 72 73 74 75
+        on right: 67
+    maybeocc <integer> (106)
+        on left: 76 77 78 79 80
+        on right: 61 63
+    mark <node> (107)
+        on left: 81 82
+        on right: 37
+    corr <node> (108)
+        on left: 83 84 85
+        on right: 38
+    jump <gotoentry> (109)
+        on left: 86 87 88 89 90 91
+        on right: 39
+    info <node> (110)
+        on left: 92 93 94
+        on right: 15 40
+    action <node> (111)
+        on left: 95 96 97 98
+        on right: 41
+    actionident <integer> (112)
+        on left: 99 100 101 102 103 104
+        on right: 96 97
+    maybeexpr <node> (113)
+        on left: 105 106
+        on right: 57 61
+    expr <node> (114)
+        on left: 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 138 139
+        on right: 4 89 90 106 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 138 145 146 147 148
+    $@12 (115)
+        on left: 137
+        on right: 138
+    methodorattribute <node> (116)
+        on left: 140 141
+        on right: 112 116
+    arglist <node> (117)
+        on left: 142 143 144
+        on right: 113 141
+    args <node> (118)
+        on left: 145 146
+        on right: 97 142 146
+    exprseq <node> (119)
+        on left: 147 148
+        on right: 81 84 93 138 148
+
+
+State 0
+
+    0 $accept: • program $end
+
+    $default  reduce using rule 2 (constdeclarations)
+
+    program            go to state 1
+    constdeclarations  go to state 2
+
+
+State 1
+
+    0 $accept: program • $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 program: constdeclarations • rules
+    4 constdeclarations: constdeclarations • CONSTSYM UNDEFIDENTSYM ASSIGNSYM $@1 expr ';'
+    5                  | constdeclarations • CONSTSYM error ';'
+    6                  | constdeclarations • CONSTSYM error CONSTSYM
+
+    UNDEFIDENTSYM    shift, and go to state 4
+    LABELIDENTSYM    shift, and go to state 5
+    UNDEFIDENTSYMAT  shift, and go to state 6
+    RULEIDENTSYMAT   shift, and go to state 7
+    CONSTSYM         shift, and go to state 8
+    CATEGORYSYM      shift, and go to state 9
+    '@'              shift, and go to state 10
+
+    $default  reduce using rule 21 (maybename)
+
+    rules      go to state 11
+    category   go to state 12
+    rule       go to state 13
+    maybename  go to state 14
+
+
+State 3
+
+    0 $accept: program $end •
+
+    $default  accept
+
+
+State 4
+
+   22 maybename: UNDEFIDENTSYM • ':' maybename
+
+    ':'  shift, and go to state 15
+
+
+State 5
+
+   23 maybename: LABELIDENTSYM • ':' maybename
+
+    ':'  shift, and go to state 16
+
+
+State 6
+
+   24 maybename: UNDEFIDENTSYMAT •
+
+    $default  reduce using rule 24 (maybename)
+
+
+State 7
+
+   25 maybename: RULEIDENTSYMAT •
+
+    $default  reduce using rule 25 (maybename)
+
+
+State 8
+
+    4 constdeclarations: constdeclarations CONSTSYM • UNDEFIDENTSYM ASSIGNSYM $@1 expr ';'
+    5                  | constdeclarations CONSTSYM • error ';'
+    6                  | constdeclarations CONSTSYM • error CONSTSYM
+
+    error          shift, and go to state 17
+    UNDEFIDENTSYM  shift, and go to state 18
+
+
+State 9
+
+   11 category: CATEGORYSYM • UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    UNDEFIDENTSYM  shift, and go to state 19
+
+
+State 10
+
+   26 maybename: '@' •
+
+    $default  reduce using rule 26 (maybename)
+
+
+State 11
+
+    1 program: constdeclarations rules •
+    9 rules: rules • category
+   10      | rules • rule
+
+    UNDEFIDENTSYM    shift, and go to state 4
+    LABELIDENTSYM    shift, and go to state 5
+    UNDEFIDENTSYMAT  shift, and go to state 6
+    RULEIDENTSYMAT   shift, and go to state 7
+    CATEGORYSYM      shift, and go to state 9
+    '@'              shift, and go to state 10
+
+    '{'       reduce using rule 21 (maybename)
+    $default  reduce using rule 1 (program)
+
+    category   go to state 20
+    rule       go to state 21
+    maybename  go to state 14
+
+
+State 12
+
+    7 rules: category •
+
+    $default  reduce using rule 7 (rules)
+
+
+State 13
+
+    8 rules: rule •
+
+    $default  reduce using rule 8 (rules)
+
+
+State 14
+
+   12 rule: maybename • '{' altrules '}'
+   15     | maybename • '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+   17     | maybename • '{' '/' STRINGSYM '/' ARROWSYM @4 rhslist '}'
+   18     | maybename • '{' '/' error '}'
+   19     | maybename • '{' error '}'
+
+    '{'  shift, and go to state 22
+
+
+State 15
+
+   22 maybename: UNDEFIDENTSYM ':' • maybename
+
+    UNDEFIDENTSYM    shift, and go to state 4
+    LABELIDENTSYM    shift, and go to state 5
+    UNDEFIDENTSYMAT  shift, and go to state 6
+    RULEIDENTSYMAT   shift, and go to state 7
+    '@'              shift, and go to state 10
+
+    $default  reduce using rule 21 (maybename)
+
+    maybename  go to state 23
+
+
+State 16
+
+   23 maybename: LABELIDENTSYM ':' • maybename
+
+    UNDEFIDENTSYM    shift, and go to state 4
+    LABELIDENTSYM    shift, and go to state 5
+    UNDEFIDENTSYMAT  shift, and go to state 6
+    RULEIDENTSYMAT   shift, and go to state 7
+    '@'              shift, and go to state 10
+
+    $default  reduce using rule 21 (maybename)
+
+    maybename  go to state 24
+
+
+State 17
+
+    5 constdeclarations: constdeclarations CONSTSYM error • ';'
+    6                  | constdeclarations CONSTSYM error • CONSTSYM
+
+    CONSTSYM  shift, and go to state 25
+    ';'       shift, and go to state 26
+
+
+State 18
+
+    4 constdeclarations: constdeclarations CONSTSYM UNDEFIDENTSYM • ASSIGNSYM $@1 expr ';'
+
+    ASSIGNSYM  shift, and go to state 27
+
+
+State 19
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM • '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    '{'  shift, and go to state 28
+
+
+State 20
+
+    9 rules: rules category •
+
+    $default  reduce using rule 9 (rules)
+
+
+State 21
+
+   10 rules: rules rule •
+
+    $default  reduce using rule 10 (rules)
+
+
+State 22
+
+   12 rule: maybename '{' • altrules '}'
+   15     | maybename '{' • '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+   17     | maybename '{' • '/' STRINGSYM '/' ARROWSYM @4 rhslist '}'
+   18     | maybename '{' • '/' error '}'
+   19     | maybename '{' • error '}'
+
+    error                 shift, and go to state 29
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '{'                   shift, and go to state 33
+    '('                   shift, and go to state 34
+    '/'                   shift, and go to state 35
+
+    altrules     go to state 36
+    altrule      go to state 37
+    lhs          go to state 38
+    elements     go to state 39
+    element      go to state 40
+    elementname  go to state 41
+
+
+State 23
+
+   22 maybename: UNDEFIDENTSYM ':' maybename •
+
+    $default  reduce using rule 22 (maybename)
+
+
+State 24
+
+   23 maybename: LABELIDENTSYM ':' maybename •
+
+    $default  reduce using rule 23 (maybename)
+
+
+State 25
+
+    6 constdeclarations: constdeclarations CONSTSYM error CONSTSYM •
+
+    $default  reduce using rule 6 (constdeclarations)
+
+
+State 26
+
+    5 constdeclarations: constdeclarations CONSTSYM error ';' •
+
+    $default  reduce using rule 5 (constdeclarations)
+
+
+State 27
+
+    4 constdeclarations: constdeclarations CONSTSYM UNDEFIDENTSYM ASSIGNSYM • $@1 expr ';'
+
+    $default  reduce using rule 3 ($@1)
+
+    $@1  go to state 42
+
+
+State 28
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' • INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    INFOSYM  shift, and go to state 43
+
+
+State 29
+
+   19 rule: maybename '{' error • '}'
+   30 altrules: error • ';' $@5 altrule
+   34 altrule: error • ARROWSYM @7 rhslist
+   58 elements: error • ','
+   69 elementname: error • '('
+
+    ARROWSYM  shift, and go to state 44
+    ';'       shift, and go to state 45
+    '('       shift, and go to state 46
+    '}'       shift, and go to state 47
+    ','       shift, and go to state 48
+
+
+State 30
+
+   66 elementname: UNDEFIDENTSYM • '('
+
+    '('  shift, and go to state 49
+
+
+State 31
+
+   64 element: ENDLEFTCONTEXTSYM •
+
+    $default  reduce using rule 64 (element)
+
+
+State 32
+
+   65 element: BEGINRIGHTCONTEXTSYM •
+
+    $default  reduce using rule 65 (element)
+
+
+State 33
+
+   15 rule: maybename '{' '{' • gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+
+    error                 shift, and go to state 50
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '('                   shift, and go to state 34
+
+    gbglhslist   go to state 51
+    lhs          go to state 52
+    elements     go to state 39
+    element      go to state 40
+    elementname  go to state 41
+
+
+State 34
+
+   67 elementname: '(' • helprule ')' '('
+   68            | '(' • error ')' '('
+
+    error           shift, and go to state 53
+    UNDEFIDENTSYM   shift, and go to state 54
+    RULEIDENTSYM    shift, and go to state 55
+    RULEIDENTSYMAT  shift, and go to state 56
+
+    helprule  go to state 57
+
+
+State 35
+
+   17 rule: maybename '{' '/' • STRINGSYM '/' ARROWSYM @4 rhslist '}'
+   18     | maybename '{' '/' • error '}'
+
+    error      shift, and go to state 58
+    STRINGSYM  shift, and go to state 59
+
+
+State 36
+
+   12 rule: maybename '{' altrules • '}'
+   28 altrules: altrules • ';' newscope altrule
+
+    ';'  shift, and go to state 60
+    '}'  shift, and go to state 61
+
+
+State 37
+
+   27 altrules: altrule •
+
+    $default  reduce using rule 27 (altrules)
+
+
+State 38
+
+   32 altrule: lhs • ARROWSYM @6 rhslist
+
+    ARROWSYM  shift, and go to state 62
+
+
+State 39
+
+   53 lhs: elements •
+   55 elements: elements • ',' element
+   57         | elements • elementname $@8 maybeexpr ')'
+
+    error          shift, and go to state 63
+    UNDEFIDENTSYM  shift, and go to state 30
+    '('            shift, and go to state 34
+    ','            shift, and go to state 64
+
+    ARROWSYM  reduce using rule 53 (lhs)
+    '~'       reduce using rule 53 (lhs)
+    ';'       reduce using rule 53 (lhs)
+
+    elementname  go to state 65
+
+
+State 40
+
+   54 elements: element •
+
+    $default  reduce using rule 54 (elements)
+
+
+State 41
+
+   61 element: elementname • $@9 maybeexpr ')' $@10 maybeocc
+   63        | elementname • error ')' $@11 maybeocc
+
+    error  shift, and go to state 66
+
+    INTEGERSYM           reduce using rule 59 ($@9)
+    REALSYM              reduce using rule 59 ($@9)
+    STRINGSYM            reduce using rule 59 ($@9)
+    UNDEFIDENTSYM        reduce using rule 59 ($@9)
+    VARIDENTSYM          reduce using rule 59 ($@9)
+    ATTRIDENTSYM         reduce using rule 59 ($@9)
+    CONSTIDENTSYM        reduce using rule 59 ($@9)
+    RULEELEMENTIDENTSYM  reduce using rule 59 ($@9)
+    FUNCIDENTSYM         reduce using rule 59 ($@9)
+    METHIDENTSYM         reduce using rule 59 ($@9)
+    PROBSYM              reduce using rule 59 ($@9)
+    FORALLSYM            reduce using rule 59 ($@9)
+    EXISTSYM             reduce using rule 59 ($@9)
+    IFSYM                reduce using rule 59 ($@9)
+    '!'                  reduce using rule 59 ($@9)
+    '('                  reduce using rule 59 ($@9)
+    ')'                  reduce using rule 59 ($@9)
+
+    $@9  go to state 67
+
+
+State 42
+
+    4 constdeclarations: constdeclarations CONSTSYM UNDEFIDENTSYM ASSIGNSYM $@1 • expr ';'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 84
+    methodorattribute  go to state 85
+
+
+State 43
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM • '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    '('  shift, and go to state 86
+
+
+State 44
+
+   34 altrule: error ARROWSYM • @7 rhslist
+
+    $default  reduce using rule 33 (@7)
+
+    @7  go to state 87
+
+
+State 45
+
+   30 altrules: error ';' • $@5 altrule
+
+    $default  reduce using rule 29 ($@5)
+
+    $@5  go to state 88
+
+
+State 46
+
+   69 elementname: error '(' •
+
+    $default  reduce using rule 69 (elementname)
+
+
+State 47
+
+   19 rule: maybename '{' error '}' •
+
+    $default  reduce using rule 19 (rule)
+
+
+State 48
+
+   58 elements: error ',' •
+
+    $default  reduce using rule 58 (elements)
+
+
+State 49
+
+   66 elementname: UNDEFIDENTSYM '(' •
+
+    $default  reduce using rule 66 (elementname)
+
+
+State 50
+
+   58 elements: error • ','
+   69 elementname: error • '('
+
+    '('  shift, and go to state 46
+    ','  shift, and go to state 48
+
+
+State 51
+
+   15 rule: maybename '{' '{' gbglhslist • @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+   52 gbglhslist: gbglhslist • ';' lhs
+
+    ';'  shift, and go to state 89
+
+    $default  reduce using rule 13 (@2)
+
+    @2  go to state 90
+
+
+State 52
+
+   51 gbglhslist: lhs •
+
+    $default  reduce using rule 51 (gbglhslist)
+
+
+State 53
+
+   68 elementname: '(' error • ')' '('
+
+    ')'  shift, and go to state 91
+
+
+State 54
+
+   70 helprule: UNDEFIDENTSYM •
+   73         | UNDEFIDENTSYM • '/' UNDEFIDENTSYM
+
+    '/'  shift, and go to state 92
+
+    $default  reduce using rule 70 (helprule)
+
+
+State 55
+
+   71 helprule: RULEIDENTSYM •
+   74         | RULEIDENTSYM • '/' UNDEFIDENTSYM
+
+    '/'  shift, and go to state 93
+
+    $default  reduce using rule 71 (helprule)
+
+
+State 56
+
+   72 helprule: RULEIDENTSYMAT •
+   75         | RULEIDENTSYMAT • '/' UNDEFIDENTSYM
+
+    '/'  shift, and go to state 94
+
+    $default  reduce using rule 72 (helprule)
+
+
+State 57
+
+   67 elementname: '(' helprule • ')' '('
+
+    ')'  shift, and go to state 95
+
+
+State 58
+
+   18 rule: maybename '{' '/' error • '}'
+
+    '}'  shift, and go to state 96
+
+
+State 59
+
+   17 rule: maybename '{' '/' STRINGSYM • '/' ARROWSYM @4 rhslist '}'
+
+    '/'  shift, and go to state 97
+
+
+State 60
+
+   28 altrules: altrules ';' • newscope altrule
+
+    $default  reduce using rule 20 (newscope)
+
+    newscope  go to state 98
+
+
+State 61
+
+   12 rule: maybename '{' altrules '}' •
+
+    $default  reduce using rule 12 (rule)
+
+
+State 62
+
+   32 altrule: lhs ARROWSYM • @6 rhslist
+
+    $default  reduce using rule 31 (@6)
+
+    @6  go to state 99
+
+
+State 63
+
+   69 elementname: error • '('
+
+    '('  shift, and go to state 46
+
+
+State 64
+
+   55 elements: elements ',' • element
+
+    error                 shift, and go to state 63
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '('                   shift, and go to state 34
+
+    element      go to state 100
+    elementname  go to state 41
+
+
+State 65
+
+   57 elements: elements elementname • $@8 maybeexpr ')'
+
+    $default  reduce using rule 56 ($@8)
+
+    $@8  go to state 101
+
+
+State 66
+
+   63 element: elementname error • ')' $@11 maybeocc
+
+    ')'  shift, and go to state 102
+
+
+State 67
+
+   61 element: elementname $@9 • maybeexpr ')' $@10 maybeocc
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    $default  reduce using rule 105 (maybeexpr)
+
+    maybeexpr          go to state 103
+    expr               go to state 104
+    methodorattribute  go to state 85
+
+
+State 68
+
+  108 expr: INTEGERSYM •
+
+    $default  reduce using rule 108 (expr)
+
+
+State 69
+
+  107 expr: REALSYM •
+
+    $default  reduce using rule 107 (expr)
+
+
+State 70
+
+  109 expr: STRINGSYM •
+
+    $default  reduce using rule 109 (expr)
+
+
+State 71
+
+  115 expr: UNDEFIDENTSYM •
+
+    $default  reduce using rule 115 (expr)
+
+
+State 72
+
+  110 expr: VARIDENTSYM •
+
+    $default  reduce using rule 110 (expr)
+
+
+State 73
+
+  140 methodorattribute: ATTRIDENTSYM •
+
+    $default  reduce using rule 140 (methodorattribute)
+
+
+State 74
+
+  114 expr: CONSTIDENTSYM •
+
+    $default  reduce using rule 114 (expr)
+
+
+State 75
+
+  111 expr: RULEELEMENTIDENTSYM •
+
+    $default  reduce using rule 111 (expr)
+
+
+State 76
+
+  113 expr: FUNCIDENTSYM • arglist
+
+    error  shift, and go to state 105
+    '('    shift, and go to state 106
+
+    arglist  go to state 107
+
+
+State 77
+
+  141 methodorattribute: METHIDENTSYM • arglist
+
+    error  shift, and go to state 105
+    '('    shift, and go to state 106
+
+    arglist  go to state 108
+
+
+State 78
+
+  134 expr: PROBSYM • '(' expr ',' expr ')'
+
+    '('  shift, and go to state 109
+
+
+State 79
+
+  135 expr: FORALLSYM • '(' expr ')'
+
+    '('  shift, and go to state 110
+
+
+State 80
+
+  136 expr: EXISTSYM • '(' expr ')'
+
+    '('  shift, and go to state 111
+
+
+State 81
+
+  138 expr: IFSYM • expr THENSYM $@12 exprseq ELSESYM exprseq ENDSYM
+  139     | IFSYM • error ENDSYM
+
+    error                shift, and go to state 112
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 113
+    methodorattribute  go to state 85
+
+
+State 82
+
+  130 expr: '!' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 114
+    methodorattribute  go to state 85
+
+
+State 83
+
+  131 expr: '(' • '-' expr ')'
+  132     | '(' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '-'                  shift, and go to state 115
+    '('                  shift, and go to state 83
+
+    expr               go to state 116
+    methodorattribute  go to state 85
+
+
+State 84
+
+    4 constdeclarations: constdeclarations CONSTSYM UNDEFIDENTSYM ASSIGNSYM $@1 expr • ';'
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ';'        shift, and go to state 131
+
+
+State 85
+
+  112 expr: methodorattribute •
+
+    $default  reduce using rule 112 (expr)
+
+
+State 86
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' • STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    STRINGSYM  shift, and go to state 132
+
+
+State 87
+
+   34 altrule: error ARROWSYM @7 • rhslist
+
+    $default  reduce using rule 35 (rhslist)
+
+    rhslist  go to state 133
+
+
+State 88
+
+   30 altrules: error ';' $@5 • altrule
+
+    error                 shift, and go to state 134
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '('                   shift, and go to state 34
+
+    altrule      go to state 135
+    lhs          go to state 38
+    elements     go to state 39
+    element      go to state 40
+    elementname  go to state 41
+
+
+State 89
+
+   52 gbglhslist: gbglhslist ';' • lhs
+
+    error                 shift, and go to state 50
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '('                   shift, and go to state 34
+
+    lhs          go to state 136
+    elements     go to state 39
+    element      go to state 40
+    elementname  go to state 41
+
+
+State 90
+
+   15 rule: maybename '{' '{' gbglhslist @2 • '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+
+    '~'  shift, and go to state 137
+
+
+State 91
+
+   68 elementname: '(' error ')' • '('
+
+    '('  shift, and go to state 138
+
+
+State 92
+
+   73 helprule: UNDEFIDENTSYM '/' • UNDEFIDENTSYM
+
+    UNDEFIDENTSYM  shift, and go to state 139
+
+
+State 93
+
+   74 helprule: RULEIDENTSYM '/' • UNDEFIDENTSYM
+
+    UNDEFIDENTSYM  shift, and go to state 140
+
+
+State 94
+
+   75 helprule: RULEIDENTSYMAT '/' • UNDEFIDENTSYM
+
+    UNDEFIDENTSYM  shift, and go to state 141
+
+
+State 95
+
+   67 elementname: '(' helprule ')' • '('
+
+    '('  shift, and go to state 142
+
+
+State 96
+
+   18 rule: maybename '{' '/' error '}' •
+
+    $default  reduce using rule 18 (rule)
+
+
+State 97
+
+   17 rule: maybename '{' '/' STRINGSYM '/' • ARROWSYM @4 rhslist '}'
+
+    ARROWSYM  shift, and go to state 143
+
+
+State 98
+
+   28 altrules: altrules ';' newscope • altrule
+
+    error                 shift, and go to state 134
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '('                   shift, and go to state 34
+
+    altrule      go to state 144
+    lhs          go to state 38
+    elements     go to state 39
+    element      go to state 40
+    elementname  go to state 41
+
+
+State 99
+
+   32 altrule: lhs ARROWSYM @6 • rhslist
+
+    $default  reduce using rule 35 (rhslist)
+
+    rhslist  go to state 145
+
+
+State 100
+
+   55 elements: elements ',' element •
+
+    $default  reduce using rule 55 (elements)
+
+
+State 101
+
+   57 elements: elements elementname $@8 • maybeexpr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    $default  reduce using rule 105 (maybeexpr)
+
+    maybeexpr          go to state 146
+    expr               go to state 104
+    methodorattribute  go to state 85
+
+
+State 102
+
+   63 element: elementname error ')' • $@11 maybeocc
+
+    $default  reduce using rule 62 ($@11)
+
+    $@11  go to state 147
+
+
+State 103
+
+   61 element: elementname $@9 maybeexpr • ')' $@10 maybeocc
+
+    ')'  shift, and go to state 148
+
+
+State 104
+
+  106 maybeexpr: expr •
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+
+    $default  reduce using rule 106 (maybeexpr)
+
+
+State 105
+
+  144 arglist: error • ')'
+
+    ')'  shift, and go to state 149
+
+
+State 106
+
+  142 arglist: '(' • args ')'
+  143        | '(' • ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+    ')'                  shift, and go to state 150
+
+    expr               go to state 151
+    methodorattribute  go to state 85
+    args               go to state 152
+
+
+State 107
+
+  113 expr: FUNCIDENTSYM arglist •
+
+    $default  reduce using rule 113 (expr)
+
+
+State 108
+
+  141 methodorattribute: METHIDENTSYM arglist •
+
+    $default  reduce using rule 141 (methodorattribute)
+
+
+State 109
+
+  134 expr: PROBSYM '(' • expr ',' expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 153
+    methodorattribute  go to state 85
+
+
+State 110
+
+  135 expr: FORALLSYM '(' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 154
+    methodorattribute  go to state 85
+
+
+State 111
+
+  136 expr: EXISTSYM '(' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 155
+    methodorattribute  go to state 85
+
+
+State 112
+
+  139 expr: IFSYM error • ENDSYM
+
+    ENDSYM  shift, and go to state 156
+
+
+State 113
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  138     | IFSYM expr • THENSYM $@12 exprseq ELSESYM exprseq ENDSYM
+
+    THENSYM    shift, and go to state 157
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+
+
+State 114
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  130     | '!' expr •
+  133     | expr • '[' expr ']'
+
+    '='    shift, and go to state 120
+    '<'    shift, and go to state 121
+    '>'    shift, and go to state 122
+    NESYM  shift, and go to state 123
+    LESYM  shift, and go to state 124
+    GESYM  shift, and go to state 125
+    '~'    shift, and go to state 126
+    '+'    shift, and go to state 127
+    '-'    shift, and go to state 128
+    '['    shift, and go to state 129
+    '.'    shift, and go to state 130
+
+    $default  reduce using rule 130 (expr)
+
+
+State 115
+
+  131 expr: '(' '-' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 158
+    methodorattribute  go to state 85
+
+
+State 116
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  132     | '(' expr • ')'
+  133     | expr • '[' expr ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 159
+
+
+State 117
+
+  129 expr: expr ASSIGNSYM • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 160
+    methodorattribute  go to state 85
+
+
+State 118
+
+  128 expr: expr '|' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 161
+    methodorattribute  go to state 85
+
+
+State 119
+
+  127 expr: expr '&' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 162
+    methodorattribute  go to state 85
+
+
+State 120
+
+  120 expr: expr '=' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 163
+    methodorattribute  go to state 85
+
+
+State 121
+
+  125 expr: expr '<' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 164
+    methodorattribute  go to state 85
+
+
+State 122
+
+  126 expr: expr '>' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 165
+    methodorattribute  go to state 85
+
+
+State 123
+
+  122 expr: expr NESYM • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 166
+    methodorattribute  go to state 85
+
+
+State 124
+
+  123 expr: expr LESYM • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 167
+    methodorattribute  go to state 85
+
+
+State 125
+
+  124 expr: expr GESYM • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 168
+    methodorattribute  go to state 85
+
+
+State 126
+
+  121 expr: expr '~' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 169
+    methodorattribute  go to state 85
+
+
+State 127
+
+  118 expr: expr '+' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 170
+    methodorattribute  go to state 85
+
+
+State 128
+
+  119 expr: expr '-' • expr
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 171
+    methodorattribute  go to state 85
+
+
+State 129
+
+  133 expr: expr '[' • expr ']'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 172
+    methodorattribute  go to state 85
+
+
+State 130
+
+  116 expr: expr '.' • methodorattribute
+  117     | expr '.' • error
+
+    error         shift, and go to state 173
+    ATTRIDENTSYM  shift, and go to state 73
+    METHIDENTSYM  shift, and go to state 77
+
+    methodorattribute  go to state 174
+
+
+State 131
+
+    4 constdeclarations: constdeclarations CONSTSYM UNDEFIDENTSYM ASSIGNSYM $@1 expr ';' •
+
+    $default  reduce using rule 4 (constdeclarations)
+
+
+State 132
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM • ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    ')'  shift, and go to state 175
+
+
+State 133
+
+   34 altrule: error ARROWSYM @7 rhslist •
+   36 rhslist: rhslist • rhs
+
+    error      shift, and go to state 176
+    MARKSYM    shift, and go to state 177
+    CORRSYM    shift, and go to state 178
+    JUMPSYM    shift, and go to state 179
+    INFOSYM    shift, and go to state 180
+    ACTIONSYM  shift, and go to state 181
+    DETECTSYM  shift, and go to state 182
+    ACCEPTSYM  shift, and go to state 183
+    LINKSYM    shift, and go to state 184
+
+    ';'  reduce using rule 34 (altrule)
+    '}'  reduce using rule 34 (altrule)
+
+    rhs  go to state 185
+
+
+State 134
+
+   34 altrule: error • ARROWSYM @7 rhslist
+   58 elements: error • ','
+   69 elementname: error • '('
+
+    ARROWSYM  shift, and go to state 44
+    '('       shift, and go to state 46
+    ','       shift, and go to state 48
+
+
+State 135
+
+   30 altrules: error ';' $@5 altrule •
+
+    $default  reduce using rule 30 (altrules)
+
+
+State 136
+
+   52 gbglhslist: gbglhslist ';' lhs •
+
+    $default  reduce using rule 52 (gbglhslist)
+
+
+State 137
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' • gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}'
+
+    error                 shift, and go to state 50
+    UNDEFIDENTSYM         shift, and go to state 30
+    ENDLEFTCONTEXTSYM     shift, and go to state 31
+    BEGINRIGHTCONTEXTSYM  shift, and go to state 32
+    '('                   shift, and go to state 34
+
+    gbglhslist   go to state 186
+    lhs          go to state 52
+    elements     go to state 39
+    element      go to state 40
+    elementname  go to state 41
+
+
+State 138
+
+   68 elementname: '(' error ')' '(' •
+
+    $default  reduce using rule 68 (elementname)
+
+
+State 139
+
+   73 helprule: UNDEFIDENTSYM '/' UNDEFIDENTSYM •
+
+    $default  reduce using rule 73 (helprule)
+
+
+State 140
+
+   74 helprule: RULEIDENTSYM '/' UNDEFIDENTSYM •
+
+    $default  reduce using rule 74 (helprule)
+
+
+State 141
+
+   75 helprule: RULEIDENTSYMAT '/' UNDEFIDENTSYM •
+
+    $default  reduce using rule 75 (helprule)
+
+
+State 142
+
+   67 elementname: '(' helprule ')' '(' •
+
+    $default  reduce using rule 67 (elementname)
+
+
+State 143
+
+   17 rule: maybename '{' '/' STRINGSYM '/' ARROWSYM • @4 rhslist '}'
+
+    $default  reduce using rule 16 (@4)
+
+    @4  go to state 187
+
+
+State 144
+
+   28 altrules: altrules ';' newscope altrule •
+
+    $default  reduce using rule 28 (altrules)
+
+
+State 145
+
+   32 altrule: lhs ARROWSYM @6 rhslist •
+   36 rhslist: rhslist • rhs
+
+    error      shift, and go to state 176
+    MARKSYM    shift, and go to state 177
+    CORRSYM    shift, and go to state 178
+    JUMPSYM    shift, and go to state 179
+    INFOSYM    shift, and go to state 180
+    ACTIONSYM  shift, and go to state 181
+    DETECTSYM  shift, and go to state 182
+    ACCEPTSYM  shift, and go to state 183
+    LINKSYM    shift, and go to state 184
+
+    ';'  reduce using rule 32 (altrule)
+    '}'  reduce using rule 32 (altrule)
+
+    rhs  go to state 185
+
+
+State 146
+
+   57 elements: elements elementname $@8 maybeexpr • ')'
+
+    ')'  shift, and go to state 188
+
+
+State 147
+
+   63 element: elementname error ')' $@11 • maybeocc
+
+    INTEGERSYM  shift, and go to state 189
+    '+'         shift, and go to state 190
+    '*'         shift, and go to state 191
+    '?'         shift, and go to state 192
+
+    $default  reduce using rule 76 (maybeocc)
+
+    maybeocc  go to state 193
+
+
+State 148
+
+   61 element: elementname $@9 maybeexpr ')' • $@10 maybeocc
+
+    $default  reduce using rule 60 ($@10)
+
+    $@10  go to state 194
+
+
+State 149
+
+  144 arglist: error ')' •
+
+    $default  reduce using rule 144 (arglist)
+
+
+State 150
+
+  143 arglist: '(' ')' •
+
+    $default  reduce using rule 143 (arglist)
+
+
+State 151
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  145 args: expr •
+  146     | expr • ',' args
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ','        shift, and go to state 195
+
+    $default  reduce using rule 145 (args)
+
+
+State 152
+
+  142 arglist: '(' args • ')'
+
+    ')'  shift, and go to state 196
+
+
+State 153
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  134     | PROBSYM '(' expr • ',' expr ')'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ','        shift, and go to state 197
+
+
+State 154
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  135     | FORALLSYM '(' expr • ')'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 198
+
+
+State 155
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  136     | EXISTSYM '(' expr • ')'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 199
+
+
+State 156
+
+  139 expr: IFSYM error ENDSYM •
+
+    $default  reduce using rule 139 (expr)
+
+
+State 157
+
+  138 expr: IFSYM expr THENSYM • $@12 exprseq ELSESYM exprseq ENDSYM
+
+    $default  reduce using rule 137 ($@12)
+
+    $@12  go to state 200
+
+
+State 158
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  131     | '(' '-' expr • ')'
+  133     | expr • '[' expr ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 201
+
+
+State 159
+
+  132 expr: '(' expr ')' •
+
+    $default  reduce using rule 132 (expr)
+
+
+State 160
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  129     | expr ASSIGNSYM expr •
+  133     | expr • '[' expr ']'
+
+    '|'    shift, and go to state 118
+    '&'    shift, and go to state 119
+    '='    shift, and go to state 120
+    '<'    shift, and go to state 121
+    '>'    shift, and go to state 122
+    NESYM  shift, and go to state 123
+    LESYM  shift, and go to state 124
+    GESYM  shift, and go to state 125
+    '~'    shift, and go to state 126
+    '+'    shift, and go to state 127
+    '-'    shift, and go to state 128
+    '['    shift, and go to state 129
+    '.'    shift, and go to state 130
+
+    ASSIGNSYM  error (nonassociative)
+
+    $default  reduce using rule 129 (expr)
+
+
+State 161
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  128     | expr '|' expr •
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '&'    shift, and go to state 119
+    '='    shift, and go to state 120
+    '<'    shift, and go to state 121
+    '>'    shift, and go to state 122
+    NESYM  shift, and go to state 123
+    LESYM  shift, and go to state 124
+    GESYM  shift, and go to state 125
+    '~'    shift, and go to state 126
+    '+'    shift, and go to state 127
+    '-'    shift, and go to state 128
+    '['    shift, and go to state 129
+    '.'    shift, and go to state 130
+
+    $default  reduce using rule 128 (expr)
+
+
+State 162
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  127     | expr '&' expr •
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '='    shift, and go to state 120
+    '<'    shift, and go to state 121
+    '>'    shift, and go to state 122
+    NESYM  shift, and go to state 123
+    LESYM  shift, and go to state 124
+    GESYM  shift, and go to state 125
+    '~'    shift, and go to state 126
+    '+'    shift, and go to state 127
+    '-'    shift, and go to state 128
+    '['    shift, and go to state 129
+    '.'    shift, and go to state 130
+
+    $default  reduce using rule 127 (expr)
+
+
+State 163
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  120     | expr '=' expr •
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '~'  shift, and go to state 126
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '='    error (nonassociative)
+    '<'    error (nonassociative)
+    '>'    error (nonassociative)
+    NESYM  error (nonassociative)
+    LESYM  error (nonassociative)
+    GESYM  error (nonassociative)
+
+    $default  reduce using rule 120 (expr)
+
+
+State 164
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  125     | expr '<' expr •
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '~'  shift, and go to state 126
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '='    error (nonassociative)
+    '<'    error (nonassociative)
+    '>'    error (nonassociative)
+    NESYM  error (nonassociative)
+    LESYM  error (nonassociative)
+    GESYM  error (nonassociative)
+
+    $default  reduce using rule 125 (expr)
+
+
+State 165
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  126     | expr '>' expr •
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '~'  shift, and go to state 126
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '='    error (nonassociative)
+    '<'    error (nonassociative)
+    '>'    error (nonassociative)
+    NESYM  error (nonassociative)
+    LESYM  error (nonassociative)
+    GESYM  error (nonassociative)
+
+    $default  reduce using rule 126 (expr)
+
+
+State 166
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  122     | expr NESYM expr •
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '~'  shift, and go to state 126
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '='    error (nonassociative)
+    '<'    error (nonassociative)
+    '>'    error (nonassociative)
+    NESYM  error (nonassociative)
+    LESYM  error (nonassociative)
+    GESYM  error (nonassociative)
+
+    $default  reduce using rule 122 (expr)
+
+
+State 167
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  123     | expr LESYM expr •
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '~'  shift, and go to state 126
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '='    error (nonassociative)
+    '<'    error (nonassociative)
+    '>'    error (nonassociative)
+    NESYM  error (nonassociative)
+    LESYM  error (nonassociative)
+    GESYM  error (nonassociative)
+
+    $default  reduce using rule 123 (expr)
+
+
+State 168
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  124     | expr GESYM expr •
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '~'  shift, and go to state 126
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '='    error (nonassociative)
+    '<'    error (nonassociative)
+    '>'    error (nonassociative)
+    NESYM  error (nonassociative)
+    LESYM  error (nonassociative)
+    GESYM  error (nonassociative)
+
+    $default  reduce using rule 124 (expr)
+
+
+State 169
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  121     | expr '~' expr •
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '+'  shift, and go to state 127
+    '-'  shift, and go to state 128
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    '~'  error (nonassociative)
+
+    $default  reduce using rule 121 (expr)
+
+
+State 170
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  118     | expr '+' expr •
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    $default  reduce using rule 118 (expr)
+
+
+State 171
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  119     | expr '-' expr •
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    '['  shift, and go to state 129
+    '.'  shift, and go to state 130
+
+    $default  reduce using rule 119 (expr)
+
+
+State 172
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  133     | expr '[' expr • ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ']'        shift, and go to state 202
+
+
+State 173
+
+  117 expr: expr '.' error •
+
+    $default  reduce using rule 117 (expr)
+
+
+State 174
+
+  116 expr: expr '.' methodorattribute •
+
+    $default  reduce using rule 116 (expr)
+
+
+State 175
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' • LINKSYM '(' STRINGSYM STRINGSYM ')' '}'
+
+    LINKSYM  shift, and go to state 203
+
+
+State 176
+
+   45 rhs: error • ')'
+
+    ')'  shift, and go to state 204
+
+
+State 177
+
+   37 rhs: MARKSYM • '(' setmark mark
+
+    '('  shift, and go to state 205
+
+
+State 178
+
+   38 rhs: CORRSYM • '(' setcorr corr
+
+    '('  shift, and go to state 206
+
+
+State 179
+
+   39 rhs: JUMPSYM • '(' setjump jump
+
+    '('  shift, and go to state 207
+
+
+State 180
+
+   40 rhs: INFOSYM • '(' setinfo info
+
+    '('  shift, and go to state 208
+
+
+State 181
+
+   41 rhs: ACTIONSYM • '(' setaction action
+
+    '('  shift, and go to state 209
+
+
+State 182
+
+   42 rhs: DETECTSYM • '(' STRINGSYM ')'
+
+    '('  shift, and go to state 210
+
+
+State 183
+
+   43 rhs: ACCEPTSYM • '(' STRINGSYM ')'
+
+    '('  shift, and go to state 211
+
+
+State 184
+
+   44 rhs: LINKSYM • '(' STRINGSYM STRINGSYM ')'
+
+    '('  shift, and go to state 212
+
+
+State 185
+
+   36 rhslist: rhslist rhs •
+
+    $default  reduce using rule 36 (rhslist)
+
+
+State 186
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist • ARROWSYM INFOSYM '(' $@3 info '}' '}'
+   52 gbglhslist: gbglhslist • ';' lhs
+
+    ARROWSYM  shift, and go to state 213
+    ';'       shift, and go to state 89
+
+
+State 187
+
+   17 rule: maybename '{' '/' STRINGSYM '/' ARROWSYM @4 • rhslist '}'
+
+    $default  reduce using rule 35 (rhslist)
+
+    rhslist  go to state 214
+
+
+State 188
+
+   57 elements: elements elementname $@8 maybeexpr ')' •
+
+    $default  reduce using rule 57 (elements)
+
+
+State 189
+
+   77 maybeocc: INTEGERSYM •
+
+    $default  reduce using rule 77 (maybeocc)
+
+
+State 190
+
+   79 maybeocc: '+' •
+
+    $default  reduce using rule 79 (maybeocc)
+
+
+State 191
+
+   78 maybeocc: '*' •
+
+    $default  reduce using rule 78 (maybeocc)
+
+
+State 192
+
+   80 maybeocc: '?' •
+
+    $default  reduce using rule 80 (maybeocc)
+
+
+State 193
+
+   63 element: elementname error ')' $@11 maybeocc •
+
+    $default  reduce using rule 63 (element)
+
+
+State 194
+
+   61 element: elementname $@9 maybeexpr ')' $@10 • maybeocc
+
+    INTEGERSYM  shift, and go to state 189
+    '+'         shift, and go to state 190
+    '*'         shift, and go to state 191
+    '?'         shift, and go to state 192
+
+    $default  reduce using rule 76 (maybeocc)
+
+    maybeocc  go to state 215
+
+
+State 195
+
+  146 args: expr ',' • args
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 151
+    methodorattribute  go to state 85
+    args               go to state 216
+
+
+State 196
+
+  142 arglist: '(' args ')' •
+
+    $default  reduce using rule 142 (arglist)
+
+
+State 197
+
+  134 expr: PROBSYM '(' expr ',' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 217
+    methodorattribute  go to state 85
+
+
+State 198
+
+  135 expr: FORALLSYM '(' expr ')' •
+
+    $default  reduce using rule 135 (expr)
+
+
+State 199
+
+  136 expr: EXISTSYM '(' expr ')' •
+
+    $default  reduce using rule 136 (expr)
+
+
+State 200
+
+  138 expr: IFSYM expr THENSYM $@12 • exprseq ELSESYM exprseq ENDSYM
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 219
+
+
+State 201
+
+  131 expr: '(' '-' expr ')' •
+
+    $default  reduce using rule 131 (expr)
+
+
+State 202
+
+  133 expr: expr '[' expr ']' •
+
+    $default  reduce using rule 133 (expr)
+
+
+State 203
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM • '(' STRINGSYM STRINGSYM ')' '}'
+
+    '('  shift, and go to state 220
+
+
+State 204
+
+   45 rhs: error ')' •
+
+    $default  reduce using rule 45 (rhs)
+
+
+State 205
+
+   37 rhs: MARKSYM '(' • setmark mark
+
+    $default  reduce using rule 46 (setmark)
+
+    setmark  go to state 221
+
+
+State 206
+
+   38 rhs: CORRSYM '(' • setcorr corr
+
+    $default  reduce using rule 47 (setcorr)
+
+    setcorr  go to state 222
+
+
+State 207
+
+   39 rhs: JUMPSYM '(' • setjump jump
+
+    $default  reduce using rule 48 (setjump)
+
+    setjump  go to state 223
+
+
+State 208
+
+   40 rhs: INFOSYM '(' • setinfo info
+
+    $default  reduce using rule 49 (setinfo)
+
+    setinfo  go to state 224
+
+
+State 209
+
+   41 rhs: ACTIONSYM '(' • setaction action
+
+    $default  reduce using rule 50 (setaction)
+
+    setaction  go to state 225
+
+
+State 210
+
+   42 rhs: DETECTSYM '(' • STRINGSYM ')'
+
+    STRINGSYM  shift, and go to state 226
+
+
+State 211
+
+   43 rhs: ACCEPTSYM '(' • STRINGSYM ')'
+
+    STRINGSYM  shift, and go to state 227
+
+
+State 212
+
+   44 rhs: LINKSYM '(' • STRINGSYM STRINGSYM ')'
+
+    STRINGSYM  shift, and go to state 228
+
+
+State 213
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM • INFOSYM '(' $@3 info '}' '}'
+
+    INFOSYM  shift, and go to state 229
+
+
+State 214
+
+   17 rule: maybename '{' '/' STRINGSYM '/' ARROWSYM @4 rhslist • '}'
+   36 rhslist: rhslist • rhs
+
+    error      shift, and go to state 176
+    MARKSYM    shift, and go to state 177
+    CORRSYM    shift, and go to state 178
+    JUMPSYM    shift, and go to state 179
+    INFOSYM    shift, and go to state 180
+    ACTIONSYM  shift, and go to state 181
+    DETECTSYM  shift, and go to state 182
+    ACCEPTSYM  shift, and go to state 183
+    LINKSYM    shift, and go to state 184
+    '}'        shift, and go to state 230
+
+    rhs  go to state 185
+
+
+State 215
+
+   61 element: elementname $@9 maybeexpr ')' $@10 maybeocc •
+
+    $default  reduce using rule 61 (element)
+
+
+State 216
+
+  146 args: expr ',' args •
+
+    $default  reduce using rule 146 (args)
+
+
+State 217
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  134     | PROBSYM '(' expr ',' expr • ')'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 231
+
+
+State 218
+
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+  147 exprseq: expr •
+  148        | expr • exprseq
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    ASSIGNSYM            shift, and go to state 117
+    '|'                  shift, and go to state 118
+    '&'                  shift, and go to state 119
+    '!'                  shift, and go to state 82
+    '='                  shift, and go to state 120
+    '<'                  shift, and go to state 121
+    '>'                  shift, and go to state 122
+    NESYM                shift, and go to state 123
+    LESYM                shift, and go to state 124
+    GESYM                shift, and go to state 125
+    '~'                  shift, and go to state 126
+    '+'                  shift, and go to state 127
+    '-'                  shift, and go to state 128
+    '['                  shift, and go to state 129
+    '.'                  shift, and go to state 130
+    '('                  shift, and go to state 83
+
+    $default  reduce using rule 147 (exprseq)
+
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 232
+
+
+State 219
+
+  138 expr: IFSYM expr THENSYM $@12 exprseq • ELSESYM exprseq ENDSYM
+
+    ELSESYM  shift, and go to state 233
+
+
+State 220
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' • STRINGSYM STRINGSYM ')' '}'
+
+    STRINGSYM  shift, and go to state 234
+
+
+State 221
+
+   37 rhs: MARKSYM '(' setmark • mark
+
+    error                shift, and go to state 235
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    mark               go to state 236
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 237
+
+
+State 222
+
+   38 rhs: CORRSYM '(' setcorr • corr
+
+    error                shift, and go to state 238
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+    ')'                  shift, and go to state 239
+
+    corr               go to state 240
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 241
+
+
+State 223
+
+   39 rhs: JUMPSYM '(' setjump • jump
+
+    error          shift, and go to state 242
+    UNDEFIDENTSYM  shift, and go to state 243
+    LABELIDENTSYM  shift, and go to state 244
+    ')'            shift, and go to state 245
+
+    jump  go to state 246
+
+
+State 224
+
+   40 rhs: INFOSYM '(' setinfo • info
+
+    error                shift, and go to state 247
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+    ')'                  shift, and go to state 248
+
+    info               go to state 249
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 250
+
+
+State 225
+
+   41 rhs: ACTIONSYM '(' setaction • action
+
+    error           shift, and go to state 251
+    TAGIDENTSYM     shift, and go to state 252
+    CHECKIDENTSYM   shift, and go to state 253
+    LOOKUPIDENTSYM  shift, and go to state 254
+    EDITIDENTSYM    shift, and go to state 255
+    HELPIDENTSYM    shift, and go to state 256
+    ACCEPTIDENTSYM  shift, and go to state 257
+    ')'             shift, and go to state 258
+
+    action       go to state 259
+    actionident  go to state 260
+
+
+State 226
+
+   42 rhs: DETECTSYM '(' STRINGSYM • ')'
+
+    ')'  shift, and go to state 261
+
+
+State 227
+
+   43 rhs: ACCEPTSYM '(' STRINGSYM • ')'
+
+    ')'  shift, and go to state 262
+
+
+State 228
+
+   44 rhs: LINKSYM '(' STRINGSYM • STRINGSYM ')'
+
+    STRINGSYM  shift, and go to state 263
+
+
+State 229
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM • '(' $@3 info '}' '}'
+
+    '('  shift, and go to state 264
+
+
+State 230
+
+   17 rule: maybename '{' '/' STRINGSYM '/' ARROWSYM @4 rhslist '}' •
+
+    $default  reduce using rule 17 (rule)
+
+
+State 231
+
+  134 expr: PROBSYM '(' expr ',' expr ')' •
+
+    $default  reduce using rule 134 (expr)
+
+
+State 232
+
+  148 exprseq: expr exprseq •
+
+    $default  reduce using rule 148 (exprseq)
+
+
+State 233
+
+  138 expr: IFSYM expr THENSYM $@12 exprseq ELSESYM • exprseq ENDSYM
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 265
+
+
+State 234
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM • STRINGSYM ')' '}'
+
+    STRINGSYM  shift, and go to state 266
+
+
+State 235
+
+   82 mark: error • ')'
+
+    ')'  shift, and go to state 267
+
+
+State 236
+
+   37 rhs: MARKSYM '(' setmark mark •
+
+    $default  reduce using rule 37 (rhs)
+
+
+State 237
+
+   81 mark: exprseq • ')'
+
+    ')'  shift, and go to state 268
+
+
+State 238
+
+   85 corr: error • ')'
+
+    ')'  shift, and go to state 269
+
+
+State 239
+
+   83 corr: ')' •
+
+    $default  reduce using rule 83 (corr)
+
+
+State 240
+
+   38 rhs: CORRSYM '(' setcorr corr •
+
+    $default  reduce using rule 38 (rhs)
+
+
+State 241
+
+   84 corr: exprseq • ')'
+
+    ')'  shift, and go to state 270
+
+
+State 242
+
+   91 jump: error • ')'
+
+    ')'  shift, and go to state 271
+
+
+State 243
+
+   87 jump: UNDEFIDENTSYM • ')'
+   89     | UNDEFIDENTSYM • ',' expr ')'
+
+    ')'  shift, and go to state 272
+    ','  shift, and go to state 273
+
+
+State 244
+
+   88 jump: LABELIDENTSYM • ')'
+   90     | LABELIDENTSYM • ',' expr ')'
+
+    ')'  shift, and go to state 274
+    ','  shift, and go to state 275
+
+
+State 245
+
+   86 jump: ')' •
+
+    $default  reduce using rule 86 (jump)
+
+
+State 246
+
+   39 rhs: JUMPSYM '(' setjump jump •
+
+    $default  reduce using rule 39 (rhs)
+
+
+State 247
+
+   94 info: error • ')'
+
+    ')'  shift, and go to state 276
+
+
+State 248
+
+   92 info: ')' •
+
+    $default  reduce using rule 92 (info)
+
+
+State 249
+
+   40 rhs: INFOSYM '(' setinfo info •
+
+    $default  reduce using rule 40 (rhs)
+
+
+State 250
+
+   93 info: exprseq • ')'
+
+    ')'  shift, and go to state 277
+
+
+State 251
+
+   98 action: error • ')'
+
+    ')'  shift, and go to state 278
+
+
+State 252
+
+   99 actionident: TAGIDENTSYM •
+
+    $default  reduce using rule 99 (actionident)
+
+
+State 253
+
+  100 actionident: CHECKIDENTSYM •
+
+    $default  reduce using rule 100 (actionident)
+
+
+State 254
+
+  101 actionident: LOOKUPIDENTSYM •
+
+    $default  reduce using rule 101 (actionident)
+
+
+State 255
+
+  102 actionident: EDITIDENTSYM •
+
+    $default  reduce using rule 102 (actionident)
+
+
+State 256
+
+  103 actionident: HELPIDENTSYM •
+
+    $default  reduce using rule 103 (actionident)
+
+
+State 257
+
+  104 actionident: ACCEPTIDENTSYM •
+
+    $default  reduce using rule 104 (actionident)
+
+
+State 258
+
+   95 action: ')' •
+
+    $default  reduce using rule 95 (action)
+
+
+State 259
+
+   41 rhs: ACTIONSYM '(' setaction action •
+
+    $default  reduce using rule 41 (rhs)
+
+
+State 260
+
+   96 action: actionident • ')'
+   97       | actionident • ',' args ')'
+
+    ')'  shift, and go to state 279
+    ','  shift, and go to state 280
+
+
+State 261
+
+   42 rhs: DETECTSYM '(' STRINGSYM ')' •
+
+    $default  reduce using rule 42 (rhs)
+
+
+State 262
+
+   43 rhs: ACCEPTSYM '(' STRINGSYM ')' •
+
+    $default  reduce using rule 43 (rhs)
+
+
+State 263
+
+   44 rhs: LINKSYM '(' STRINGSYM STRINGSYM • ')'
+
+    ')'  shift, and go to state 281
+
+
+State 264
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' • $@3 info '}' '}'
+
+    $default  reduce using rule 14 ($@3)
+
+    $@3  go to state 282
+
+
+State 265
+
+  138 expr: IFSYM expr THENSYM $@12 exprseq ELSESYM exprseq • ENDSYM
+
+    ENDSYM  shift, and go to state 283
+
+
+State 266
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM • ')' '}'
+
+    ')'  shift, and go to state 284
+
+
+State 267
+
+   82 mark: error ')' •
+
+    $default  reduce using rule 82 (mark)
+
+
+State 268
+
+   81 mark: exprseq ')' •
+
+    $default  reduce using rule 81 (mark)
+
+
+State 269
+
+   85 corr: error ')' •
+
+    $default  reduce using rule 85 (corr)
+
+
+State 270
+
+   84 corr: exprseq ')' •
+
+    $default  reduce using rule 84 (corr)
+
+
+State 271
+
+   91 jump: error ')' •
+
+    $default  reduce using rule 91 (jump)
+
+
+State 272
+
+   87 jump: UNDEFIDENTSYM ')' •
+
+    $default  reduce using rule 87 (jump)
+
+
+State 273
+
+   89 jump: UNDEFIDENTSYM ',' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 285
+    methodorattribute  go to state 85
+
+
+State 274
+
+   88 jump: LABELIDENTSYM ')' •
+
+    $default  reduce using rule 88 (jump)
+
+
+State 275
+
+   90 jump: LABELIDENTSYM ',' • expr ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 286
+    methodorattribute  go to state 85
+
+
+State 276
+
+   94 info: error ')' •
+
+    $default  reduce using rule 94 (info)
+
+
+State 277
+
+   93 info: exprseq ')' •
+
+    $default  reduce using rule 93 (info)
+
+
+State 278
+
+   98 action: error ')' •
+
+    $default  reduce using rule 98 (action)
+
+
+State 279
+
+   96 action: actionident ')' •
+
+    $default  reduce using rule 96 (action)
+
+
+State 280
+
+   97 action: actionident ',' • args ')'
+
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+
+    expr               go to state 151
+    methodorattribute  go to state 85
+    args               go to state 287
+
+
+State 281
+
+   44 rhs: LINKSYM '(' STRINGSYM STRINGSYM ')' •
+
+    $default  reduce using rule 44 (rhs)
+
+
+State 282
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 • info '}' '}'
+
+    error                shift, and go to state 247
+    INTEGERSYM           shift, and go to state 68
+    REALSYM              shift, and go to state 69
+    STRINGSYM            shift, and go to state 70
+    UNDEFIDENTSYM        shift, and go to state 71
+    VARIDENTSYM          shift, and go to state 72
+    ATTRIDENTSYM         shift, and go to state 73
+    CONSTIDENTSYM        shift, and go to state 74
+    RULEELEMENTIDENTSYM  shift, and go to state 75
+    FUNCIDENTSYM         shift, and go to state 76
+    METHIDENTSYM         shift, and go to state 77
+    PROBSYM              shift, and go to state 78
+    FORALLSYM            shift, and go to state 79
+    EXISTSYM             shift, and go to state 80
+    IFSYM                shift, and go to state 81
+    '!'                  shift, and go to state 82
+    '('                  shift, and go to state 83
+    ')'                  shift, and go to state 248
+
+    info               go to state 288
+    expr               go to state 218
+    methodorattribute  go to state 85
+    exprseq            go to state 250
+
+
+State 283
+
+  138 expr: IFSYM expr THENSYM $@12 exprseq ELSESYM exprseq ENDSYM •
+
+    $default  reduce using rule 138 (expr)
+
+
+State 284
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' • '}'
+
+    '}'  shift, and go to state 289
+
+
+State 285
+
+   89 jump: UNDEFIDENTSYM ',' expr • ')'
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 290
+
+
+State 286
+
+   90 jump: LABELIDENTSYM ',' expr • ')'
+  116 expr: expr • '.' methodorattribute
+  117     | expr • '.' error
+  118     | expr • '+' expr
+  119     | expr • '-' expr
+  120     | expr • '=' expr
+  121     | expr • '~' expr
+  122     | expr • NESYM expr
+  123     | expr • LESYM expr
+  124     | expr • GESYM expr
+  125     | expr • '<' expr
+  126     | expr • '>' expr
+  127     | expr • '&' expr
+  128     | expr • '|' expr
+  129     | expr • ASSIGNSYM expr
+  133     | expr • '[' expr ']'
+
+    ASSIGNSYM  shift, and go to state 117
+    '|'        shift, and go to state 118
+    '&'        shift, and go to state 119
+    '='        shift, and go to state 120
+    '<'        shift, and go to state 121
+    '>'        shift, and go to state 122
+    NESYM      shift, and go to state 123
+    LESYM      shift, and go to state 124
+    GESYM      shift, and go to state 125
+    '~'        shift, and go to state 126
+    '+'        shift, and go to state 127
+    '-'        shift, and go to state 128
+    '['        shift, and go to state 129
+    '.'        shift, and go to state 130
+    ')'        shift, and go to state 291
+
+
+State 287
+
+   97 action: actionident ',' args • ')'
+
+    ')'  shift, and go to state 292
+
+
+State 288
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info • '}' '}'
+
+    '}'  shift, and go to state 293
+
+
+State 289
+
+   11 category: CATEGORYSYM UNDEFIDENTSYM '{' INFOSYM '(' STRINGSYM ')' LINKSYM '(' STRINGSYM STRINGSYM ')' '}' •
+
+    $default  reduce using rule 11 (category)
+
+
+State 290
+
+   89 jump: UNDEFIDENTSYM ',' expr ')' •
+
+    $default  reduce using rule 89 (jump)
+
+
+State 291
+
+   90 jump: LABELIDENTSYM ',' expr ')' •
+
+    $default  reduce using rule 90 (jump)
+
+
+State 292
+
+   97 action: actionident ',' args ')' •
+
+    $default  reduce using rule 97 (action)
+
+
+State 293
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' • '}'
+
+    '}'  shift, and go to state 294
+
+
+State 294
+
+   15 rule: maybename '{' '{' gbglhslist @2 '~' gbglhslist ARROWSYM INFOSYM '(' $@3 info '}' '}' •
+
+    $default  reduce using rule 15 (rule)

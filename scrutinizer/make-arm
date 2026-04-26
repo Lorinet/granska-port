@@ -1,0 +1,9 @@
+#!/bin/bash
+make clean
+                                  make scrut/rules.tab.h
+                                  make \
+                                        CPPC=aarch64-linux-musl-g++ \
+                                        CC=aarch64-linux-musl-gcc \
+                                        CFLAGS="-O3 -fgnu89-inline -static -fPIC" \
+                                        ALL_FLAGS="-O3 -static -fPIC -DAPI -DPROB_DOUBLE -DMESSAGES -DTIMER -DDEVELOPER_OUTPUT -Icommon -Itagger -Iscrut -Iprob -Istava -Itoken -I." -j28 \
+                                        libgranska.a
